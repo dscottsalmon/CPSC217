@@ -1,0 +1,80 @@
+#Name - David Salmon UCID - 30093320 Tutorial - T04
+
+#this is the final version of my program. I learned about the isnumeric() function when i was googling how to do an "how to test if a string is an integer python"
+#https://www.w3schools.com/python/ref_string_isnumeric.asp was the top result, it gave a brief description on how to use the command.
+#Everything else is pretty straightforward, I tried to keep good comments.
+
+
+sentinel = 'x'                  #'x' is the shutdown code in the picologo data file
+line = 0                        #this variable is counting the line number. It goes up by 1 every time the loop resets
+n = 0                           #this variable is counting the amount of errors in the program if there are any.
+m = 1                           #this varibale is the multiplier/repeat count.
+i = 0                           #initializing varible in a 'while' loop later.
+
+import turtle
+turtle.setup(640,480)
+
+while True:
+        p = input()             #p stands for inPut
+        V = 0                   #V is my error determiner. If an error occurs V becomes 1 and the action is not preformed and a message is sent instead.
+        line = line + 1
+
+        if p == sentinel:       #this shuts down the program when the sentinel value is reached
+                break
+
+        if len(p)>1:            #this is calculating if the length of the string is more then 1.
+                print('***The command on line number',line,'is too long***')
+                V = 1
+                n = n + 1
+        else:
+
+                if p.isnumeric():               #this is a true/false statement. If the string is numeric, then it's true. Otherwise it's false and the else occurs.
+                        pass
+                else:
+                        if p!= ('b') and p!= ('d') and p!= ('f') and p!= ('l') and p!= ('r') and p!= ('u') and p!=('x') and len(p)!=0: #this tests if it's an accepted command or a blank.
+                                print('***The command on line number',line,'is an Unknown Command***')
+                                V = 1
+                                n = n + 1
+
+                                if p == 'B':    #this tests if it was an uppercase or not, not necessary but i thought it was nice to give a more specific explanation for the error
+                                        print('-Error probably caused by uppercase B command')
+                                if p == 'D':
+                                        print('-Error probably caused by uppercase D command')
+                                if p == 'F':
+                                        print('-Error probably caused by uppercase F command')
+                                if p == 'L':
+                                        print('-Error probably caused by uppercase L command')
+                                if p == 'R':
+                                        print('-Error probably caused by uppercase R command')
+                                if p == 'U':
+                                        print('-Error probably caused by uppercase U command')
+                                if p == 'X':
+                                        print('-Error probably caused by uppercase X command')
+
+        if V != 1:
+                if p.isnumeric():               #this is a true/false statement. If the string is numeric, then it's true. otherwise it's false and the else occurs.
+                        p = int(p)
+                        m = m*p
+                else:
+                        while i < m:            #this loops the command until i=m. if m=9, the loop needs to run 9 times for i=m.
+                                if p == ('b'):
+                                        turtle.fd(-1)
+                                if p == ('d'):
+                                        turtle.pd()
+                                if p == ('f'):
+                                        turtle.fd(1)
+                                if p == ('l'):
+                                        turtle.lt(1)
+                                if p == ('r'):
+                                        turtle.rt(1)
+                                if p == ('u'):
+                                        turtle.pu()
+                                i = i + 1
+                        m = 1   #this resets my multiplier to 1 and my i variable to 0, for the next line of code.
+                        i = 0
+        if V != 0:
+                m = 1                           #this resets my multiplier to 1 if there is an error.
+
+if n != 0:                                      #this prints the amount of errors if there were any.
+        print('Number of errors:',n)
+

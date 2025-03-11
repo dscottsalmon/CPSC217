@@ -1,0 +1,157 @@
+# Name - David Salmon UCID - 30093320 Tutorial - T04
+
+#this is the final version of my program. The setup is directly inspired from what Dr. Aycock posted on the Assignment 4
+#specifications. Everything else was completely on my own or inspired from the slides.
+
+
+
+import sys
+
+
+def getcandidates(filename):                    #the first portion of the program. This part maps a dictionary with all the candidate names and assigns a value of 0 to them.
+        try:                                    #it also maps "Spoiled Ballots" to said dictionary and assigns a value of 0
+                f = open(filename)
+                candidates = {}
+                while True:
+                        line = f.readline()
+                        if line == '':
+                                break
+                        line = line.strip()
+                        candidates[line] = 0
+                f.close()
+                candidates['Spoiled:'] = 0
+        except IOError:
+                print('An I/O error has occured with the candidate file, using file ',filename,'. Please try again.',sep='')    #prints off if an I/O error occurs. Shouldn't ever be
+                sys.exit()                                                              #printed off as this I/O error is also covered in the process function, but its here just in case.
+
+        #print(candidates)      #the print statements that are commented off were used for debugging as I worked. I'm keeping them around in case I need to do some last minute debugging.
+        return candidates
+
+
+
+
+
+def countvote(filename, candidates):            #this function is the meat and potatoes of the program.
+        try:
+                f = open(filename)
+                n = len(candidates) - 1
+                stored=[]
+                i = 0
+                valid = True
+                counter = 0
+                for _ in range(n):
+                        line = f.readline()
+                        if line == '':
+                                break
+                        line = line.strip()
+#                       print(line)
+                        list = line.split('\t')         #First it formats each line from the ballot and then stores each ballot as a list.
+#                       print(list)
+                        stored.append(list)
+#                       print(stored)
+#                       print(candidates)
+                for i in range(n):              #Next it verifies if the ballot is spoiled or not. If its spoiled then valid = False.
+                        try:
+                                if stored[i][0] not in candidates:
+                                        valid = False
+#                                       print('problem in a')
+
+                                if len(stored[i]) != 2:
+                                        valid = False
+#                                       print('problem in b')
+                                else:
+                                        try:
+                                                integer = int(stored[i][1])
+                                        except ValueError:
+                                                valid = False
+#                                               print('problem in c')
+                        except IndexError:
+                                valid = False
+#                               print('problem in d')
+                        i = i + 1
+
+                if valid == False:              #If the ballot is spoiled counter goes up by one. Otherwise the votes are added to the candidate dictionary.
+                        counter = counter + 1
+                else:
+                        for _ in range(n):
+                                oldcount = candidates[stored[_][0]]
+                                integer = int(stored[_][1])
+                                points = n - integer
+                                newcount = points + oldcount
+                                candidates[stored[_][0]] = newcount
+
+                f.close()
+        except IOError:
+                print('An I/O error has occured with the ballot file(s), using file ',filename,'. Please try again.',sep='')    #prints off if an I/O error occured.
+                sys.exit()
+
+        integer = candidates['Spoiled:']        #Finally, the spoiled votes are added to the counter in the candidate dictionary, which is then returned.
+        newcount = counter + integer
+        candidates['Spoiled:'] = newcount
+#       print(candidates)
+        return candidates
+
+def process(candidatesfile,ballotfilelist):     #this function is the actual "process" of the program, hence the name.
+        i = 0
+        f = 0
+        try:
+                t = len(candidatesfile)         #first it's all in a try: except: command incase an I/O error occurs. Otherwise this first bit is just variable initialization
+                n = len(ballotfilelist)
+                f = open(candidatesfile)
+                s = 0
+                list = []
+                while True:
+                        try:
+                                line = f.readline()
+                                if line == '':
+                                        break           #this makes a new list, very similar to the getcandidates() function, however this list will be used to print the final result
+                                line = line.strip()
+                                list.append(line)
+#                               print(list)
+                        except IOError:
+                                sys.exit()
+                f.close()
+                candidates = getcandidates(candidatesfile)      #this gets our dictionary of candidates/points and spoiled ballots from the getcandidates() function
+#               print(candidates)
+                for i in range(n):                              #this is the actual counting occuring in the dictionary.
+                        counting = countvote(ballotfilelist[i],candidates)
+#                       print(counting)
+                        i = i + 1
+                s = counting['Spoiled:']                        #this is extracting the amount of spoiled ballots from the dictionary and assigning it to a variable
+                for _ in range(t):
+                        try:
+#                               pass
+                                print(counting[list[_]],list[_], sep ='\t')     #this is the actual printing that you can see. it prints the amount of points first then the name of the
+                        except IndexError:                                      #of the candidate
+                                print('TOTAL NUMBER OF BALLOTS:',n)
+                                print('TOTAL NUMBER OF VALID BALLOTS:', n-s)
+                                print('TOTAL NUMBER OF SPOILED BALLOTS:',s)
+                                sys.exit()
+                print('TOTAL NUMBER OF BALLOTS:',n)                     #the reason its written twice is so this is printed regardless of how many ballots and candidates there are.
+                print('TOTAL NUMBER OF VALID BALLOTS:', n-s)            #if i only had one set it would only print if there were more ballots than there were individual candidates
+                print('TOTAL NUMBER OF SPOILED BALLOTS:',s)
+                sys.exit()
+        except IOError:
+                print('An I/O error has occured with the candidate file. The file used was, ',candidatesfile,'. Please try again.',sep='')      #prints off if an I/O error occured.
+		sys.exit()
+
+
+
+BALLOT = sys.argv               #this is the "main" part of the code even though it's the shortest.
+try:                            #first it assigns all command line arguments to ballot, then it tries to assign the candidate file to file if a file is supplied.
+        FILE = sys.argv[1]
+except IndexError:
+        print('No command line argument was supplied. Please try again.')
+        sys.exit()
+BALLOT.pop(0)                   #next it pops the 0th index of the ballot list. (assignment.py)
+try:
+        BALLOT.pop(0)           #after that it tries to pop the new 0th index of the ballot list. (txcand.txt if inputted correctly, otherwise indexerror above should catch it
+        CANNONFODDERVARIBALE = sys.argv[0]      #if sys.argv[0] does not exist then an index error occurs as no ballot files were inputted.
+except IndexError:
+        print('Only one command line argument was supplied. Please try again.')
+        sys.exit()
+
+
+
+process(FILE,BALLOT)            #and this runs everything.
+
