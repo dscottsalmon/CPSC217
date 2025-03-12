@@ -4,3 +4,6 @@ Coursework for CPSC 217 "Introduction to Computer Science for Multidisciplinary 
 Grades:
 
 Didn't record
+
+Final Letter Grade:
+### A-
